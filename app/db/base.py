@@ -13,3 +13,4 @@ from app.models.supplier import Supplier
 from app.models.price_history import PriceHistory
 from app.models.purchase_request import PurchaseRequest
 from app.models.document import Document
+from app.models.assignment import Sector, Ticket, Task
