@@ -1,0 +1,15 @@
+from fastapi import APIRouter
+from app.api.routes import auth, clients, services, companies, admin, billing, agents, plans, diagnostics, requests, users
+
+api_router = APIRouter()
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+api_router.include_router(companies.router, prefix="/companies", tags=["companies"])
+api_router.include_router(clients.router, prefix="/clients", tags=["clients"])
+api_router.include_router(services.router, prefix="/services", tags=["services"])
+api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+api_router.include_router(billing.router, prefix="/billing", tags=["billing"])
+api_router.include_router(agents.router, prefix="/agents", tags=["agents"])
+api_router.include_router(plans.router, prefix="/plans", tags=["plans"])
+api_router.include_router(diagnostics.router, prefix="/diagnostics", tags=["diagnostics"])
+api_router.include_router(requests.router, prefix="/requests", tags=["requests"])
+api_router.include_router(users.router, prefix="/users", tags=["users"])
