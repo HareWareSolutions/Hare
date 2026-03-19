@@ -11,10 +11,14 @@ from app.schemas.role import Role as RoleSchema, RoleCreate, RoleUpdate
 router = APIRouter()
 
 SYSTEM_ROLES = [
-    {"name": "Admin", "description": "Acesso total à empresa", "permissions": ["*"], "is_system": True},
-    {"name": "Gerente Financeiro", "description": "Gestão de finanças e faturamento", "permissions": ["finance.*"], "is_system": True},
-    {"name": "Gerente de Vendas", "description": "Gestão de leads e funil de vendas", "permissions": ["sales.*"], "is_system": True},
-    {"name": "Gerente de RH", "description": "Gestão de usuários e solicitações", "permissions": ["users.*", "requests.*"], "is_system": True},
+    {"name": "Administrador", "description": "Acesso total a todos os módulos do sistema", "permissions": ["*"], "is_system": True},
+    {"name": "Gerente de Vendas", "description": "Gestão completa de leads, funil e metas de vendas", "permissions": ["sales.*", "clients.read", "services.read"], "is_system": True},
+    {"name": "Vendedor", "description": "Registro de vendas e movimentação de leads no funil", "permissions": ["sales.sales.write", "sales.funnel.leads.write", "clients.read", "services.read"], "is_system": True},
+    {"name": "Gerente Financeiro", "description": "Controle total de fluxo de caixa, faturamento e contas", "permissions": ["finance.*", "billing.*", "purchases.*"], "is_system": True},
+    {"name": "Suporte e CS", "description": "Gestão de solicitações de suporte e chamados técnicos", "permissions": ["support.*", "assignments.read", "clients.read"], "is_system": True},
+    {"name": "Gestor de Projetos", "description": "Criação e atribuição de tickets e tarefas para a equipe", "permissions": ["assignments.*", "documents.read", "users.read"], "is_system": True},
+    {"name": "Operador", "description": "Execução e atualização de tarefas atribuídas", "permissions": ["assignments.tasks.update", "assignments.read", "documents.read"], "is_system": True},
+    {"name": "Recursos Humanos", "description": "Gestão de usuários, cargos e solicitações internas", "permissions": ["users.*", "roles.*", "requests.*"], "is_system": True},
 ]
 
 def seed_system_roles(db: Session):
