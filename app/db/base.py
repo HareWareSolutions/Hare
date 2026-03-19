@@ -7,3 +7,4 @@ from app.models.plan import Plan
 from app.models.diagnostic import Diagnostic
 from app.models.lead import Lead
 from app.models.request import Request
+from app.models.transaction import Transaction
