@@ -9,3 +9,6 @@ from app.models.lead import Lead
 from app.models.request import Request
 from app.models.transaction import Transaction
 from app.models.role import Role
+from app.models.supplier import Supplier
+from app.models.price_history import PriceHistory
+from app.models.purchase_request import PurchaseRequest
