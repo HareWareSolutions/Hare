@@ -8,3 +8,4 @@ from app.models.diagnostic import Diagnostic
 from app.models.lead import Lead
 from app.models.request import Request
 from app.models.transaction import Transaction
+from app.models.role import Role

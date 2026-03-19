@@ -6,6 +6,7 @@ from uuid import UUID
 from app.api.deps import SessionDep, CurrentUser
 from app.core import security
 from app.models.user import User
+from app.models.role import Role
 from app.schemas.user import User as UserSchema, UserUpdate
 
 router = APIRouter()
@@ -42,6 +43,12 @@ def update_user(
         password = update_data.pop("password")
         user.hashed_password = security.get_password_hash(password)
         
+    if "role_ids" in update_data:
+        role_ids = update_data.pop("role_ids")
+        if role_ids is not None:
+            roles = db.query(Role).filter(Role.id.in_(role_ids)).all()
+            user.roles = roles
+            
     for field in update_data:
         setattr(user, field, update_data[field])
         

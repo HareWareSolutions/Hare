@@ -1,8 +1,9 @@
 import uuid
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.db.database import Base
+from app.models.user_role import user_roles
 
 class User(Base):
     __tablename__ = "users"
@@ -18,3 +19,5 @@ class User(Base):
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    roles = relationship("Role", secondary=user_roles, backref="users")

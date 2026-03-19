@@ -59,3 +59,10 @@ def login(db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()) -> A
         "refresh_token": security.create_refresh_token(user.id),
         "token_type": "bearer",
     }
+
+@router.get("/me", response_model=UserSchema)
+def read_user_me(current_user: CurrentUser) -> Any:
+    """
+    Get current user.
+    """
+    return current_user

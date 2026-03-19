@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
+from app.schemas.role import Role
 from uuid import UUID
 from datetime import datetime
 
@@ -14,6 +15,7 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     password: Optional[str] = None
     is_active: Optional[bool] = None
+    role_ids: Optional[List[UUID]] = None
 
 class UserCreate(UserBase):
     password: str
@@ -32,7 +34,7 @@ class UserInDBBase(UserBase):
         from_attributes = True
 
 class User(UserInDBBase):
-    pass
+    roles: List[Role] = []
 
 class Token(BaseModel):
     access_token: str
