@@ -15,3 +15,4 @@ from app.models.purchase_request import PurchaseRequest
 from app.models.document import Document
 from app.models.assignment import Sector, Ticket, Task
 from app.models.support import SupportRequest
+from app.models.sales import SalesFunnelStage, SalesGoal, Sale
