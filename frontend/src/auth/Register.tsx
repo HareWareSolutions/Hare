@@ -12,8 +12,19 @@ export function Register() {
   const [password, setPassword] = useState('');
   const [fullname, setFullname] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [documentType, setDocumentType] = useState('PJ'); // 'PF' or 'PJ'
+  const [document, setDocument] = useState('');
+  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const formatDocument = (value: string, type: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (type === 'PF') {
+      return digits.slice(0, 11).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    return digits.slice(0, 14).replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +34,13 @@ export function Register() {
         email,
         password,
         full_name: fullname,
-        company_name: companyName
+        company_name: companyName,
+        document: document.replace(/\D/g, ''),
+        document_type: documentType,
+        phone: phone.replace(/\D/g, '')
       });
       
-      toast.success('Cadastro realizado com sucesso! Faça login.');
+      toast.success('Cadastro realizado com sucesso! Sua conta está pendente de aprovação pelo administrador.');
       navigate('/login');
     } catch (error) {
       toast.error('Erro ao cadastrar. O email já pode estar em uso.');
@@ -59,6 +73,41 @@ export function Register() {
             <div className="space-y-2">
               <Label htmlFor="fullname" className="text-xs font-bold uppercase tracking-wider text-primary">Seu Nome</Label>
               <Input id="fullname" required value={fullname} onChange={(e) => setFullname(e.target.value)} className="bg-slate-50 focus:border-accent focus:ring-accent" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase tracking-wider text-primary">Tipo de Pessoa</Label>
+                <div className="flex p-1 bg-slate-100 rounded-md gap-1">
+                  <button type="button" onClick={() => setDocumentType('PJ')} className={`flex-1 text-[10px] font-black uppercase py-2 rounded ${documentType === 'PJ' ? 'bg-primary text-white shadow-sm' : 'text-primary/40'}`}>PJ</button>
+                  <button type="button" onClick={() => setDocumentType('PF')} className={`flex-1 text-[10px] font-black uppercase py-2 rounded ${documentType === 'PF' ? 'bg-primary text-white shadow-sm' : 'text-primary/40'}`}>PF</button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="document" className="text-xs font-bold uppercase tracking-wider text-primary">
+                  {documentType === 'PJ' ? 'CNPJ' : 'CPF'}
+                </Label>
+                <Input 
+                  id="document" 
+                  required 
+                  value={document} 
+                  maxLength={documentType === 'PJ' ? 18 : 14}
+                  onChange={(e) => setDocument(formatDocument(e.target.value, documentType))} 
+                  placeholder={documentType === 'PJ' ? '00.000.000/0000-00' : '000.000.000-00'}
+                  className="bg-slate-50 focus:border-accent focus:ring-accent" 
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-primary">Telefone / WhatsApp</Label>
+              <Input 
+                id="phone" 
+                required 
+                type="tel"
+                value={phone} 
+                onChange={(e) => setPhone(e.target.value)} 
+                placeholder="(00) 00000-0000"
+                className="bg-slate-50 focus:border-accent focus:ring-accent" 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-primary">Email Corporativo</Label>

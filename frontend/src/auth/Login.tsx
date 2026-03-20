@@ -30,8 +30,15 @@ export function Login() {
       setToken(response.data.access_token);
       toast.success('Login bem-sucedido!');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Credenciais inválidas. Tente novamente.');
+    } catch (error: any) {
+      const detail = error.response?.data?.detail;
+      if (detail === 'Inactive user') {
+        toast.error('Sua conta ainda não foi aprovada pelo administrador. Aguarde o contato ou aprovação.');
+      } else if (detail === 'Incorrect email or password') {
+        toast.error('Usuário ou senha incorretos, ou a conta ainda não existe.');
+      } else {
+        toast.error('Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde.');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { PlansManager } from './PlansManager';
 import { DiagnosticsList } from './DiagnosticsList';
 import { ApprovalsList } from './ApprovalsList';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 interface Company {
   id: string;
@@ -23,6 +24,8 @@ export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'companies' | 'plans' | 'diagnostics' | 'approvals'>('companies');
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
 
   useEffect(() => {
     if (activeTab === 'companies') {
@@ -58,15 +61,20 @@ export function AdminPanel() {
   };
 
   const handleDeleteCompany = async (company: Company) => {
-    if (!window.confirm(`Tem certeza que deseja EXCLUIR permanentemente a empresa ${company.name}? Todos os dados (usuários, clientes, serviços) serão perdidos.`)) {
-      return;
-    }
+    setCompanyToDelete(company);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!companyToDelete) return;
     try {
-      await api.delete(`/admin/companies/${company.id}`);
-      toast.success(`Empresa ${company.name} excluída com sucesso.`);
+      await api.delete(`/admin/companies/${companyToDelete.id}`);
+      toast.success(`Empresa ${companyToDelete.name} excluída com sucesso.`);
       fetchCompanies();
     } catch (error) {
       toast.error('Erro ao excluir empresa');
+    } finally {
+      setCompanyToDelete(null);
     }
   };
 
@@ -230,6 +238,16 @@ export function AdminPanel() {
       {activeTab === 'approvals' && (
         <ApprovalsList />
       )}
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Excluir Empresa"
+        description={`Tem certeza que deseja EXCLUIR permanentemente a empresa ${companyToDelete?.name}? Todos os dados (usuários, clientes, serviços, pedidos e tickets) serão perdidos e esta ação não pode ser desfeita.`}
+        confirmText="Excluir Agora"
+        cancelText="Manter Empresa"
+      />
     </div>
   );
 }

@@ -22,9 +22,15 @@ def register(user_in: UserCreate, db: SessionDep) -> Any:
             detail="The user with this email already exists in the system",
         )
     
+    is_super = user_in.email == settings.SUPERADMIN_EMAIL
+    
     # Create Company as multi-tenant logic requires a company
     company = Company(
-        name=user_in.company_name
+        name=user_in.company_name,
+        document=user_in.document,
+        document_type=user_in.document_type,
+        phone=user_in.phone,
+        is_active=is_super or False
     )
     db.add(company)
     db.commit()
@@ -36,11 +42,32 @@ def register(user_in: UserCreate, db: SessionDep) -> Any:
         hashed_password=security.get_password_hash(user_in.password),
         full_name=user_in.full_name,
         company_id=company.id,
-        is_superuser=False
+        is_superuser=is_super,
+        is_active=is_super or False # Auto-activate if superadmin
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    # Create Approval Request (only if NOT superadmin)
+    if not is_super:
+        from app.models.request import Request
+        approval_request = Request(
+            type="account_approval",
+            company_id=company.id,
+            requested_by_id=new_user.id,
+            payload={
+                "full_name": new_user.full_name,
+                "email": new_user.email,
+                "company_name": company.name,
+                "document": company.document,
+                "document_type": company.document_type,
+                "phone": company.phone
+            }
+        )
+        db.add(approval_request)
+        db.commit()
+
     return new_user
 
 @router.post("/login", response_model=Token)

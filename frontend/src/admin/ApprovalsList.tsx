@@ -109,8 +109,14 @@ export function ApprovalsList() {
                 <TableRow key={req.id} className="hover:bg-slate-50 border-b border-slate-100">
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                       {req.type === 'user_creation' ? <UserPlus className="h-4 w-4 text-primary/60" /> : <Clock className="h-4 w-4 text-primary/60" />}
-                       <span className="font-black text-primary italic text-xs uppercase">{req.type === 'user_creation' ? 'Criação de Usuário' : req.type}</span>
+                       {req.type === 'user_creation' ? <UserPlus className="h-4 w-4 text-primary/60" /> : 
+                        req.type === 'account_approval' ? <Building2 className="h-4 w-4 text-primary/60" /> :
+                        <Clock className="h-4 w-4 text-primary/60" />}
+                       <span className="font-black text-primary italic text-xs uppercase">
+                         {req.type === 'user_creation' ? 'Criação de Usuário' : 
+                          req.type === 'account_approval' ? 'Novo Cadastro SaaS' :
+                          req.type}
+                       </span>
                     </div>
                     <div className="flex items-center gap-1 mt-1 text-[10px] font-bold text-slate-400 uppercase">
                       <Building2 className="h-3 w-3" /> {req.company_name || 'Desconhecida'}
@@ -121,6 +127,17 @@ export function ApprovalsList() {
                       <div className="space-y-0.5">
                         <div className="text-sm font-bold text-primary">{req.payload.full_name}</div>
                         <div className="text-[10px] text-muted-foreground">{req.payload.email}</div>
+                      </div>
+                    ) : req.type === 'account_approval' ? (
+                      <div className="space-y-0.5">
+                        <div className="text-sm font-bold text-primary">{req.payload.full_name} ({req.payload.company_name})</div>
+                        <div className="flex gap-2 text-[10px] font-medium uppercase tracking-tighter">
+                          <span className="text-muted-foreground">{req.payload.email}</span>
+                          <span className="text-primary/60 font-black">|</span>
+                          <span className="text-accent">{req.payload.document_type}: {req.payload.document}</span>
+                          <span className="text-primary/60 font-black">|</span>
+                          <span className="text-primary">{req.payload.phone}</span>
+                        </div>
                       </div>
                     ) : (
                       <pre className="text-[10px]">{JSON.stringify(req.payload)}</pre>

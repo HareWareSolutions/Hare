@@ -19,6 +19,7 @@ import { RolesManager } from '@/admin/RolesManager';
 import { DocumentsPanel } from './documents/DocumentsPanel';
 import { AssignmentsPanel } from './assignments/AssignmentsPanel';
 import { SalesPanel } from './sales/SalesPanel';
+import { Toaster } from 'sonner';
 
 function ProtectedRoute({ children, superuserOnly = false }: { children: React.ReactNode, superuserOnly?: boolean }) {
   const token = useAuthStore((state) => state.token);
@@ -47,6 +48,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacidade" element={<PrivacyPage />} />

@@ -19,7 +19,10 @@ class UserUpdate(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    company_name: str # Using this specifically for tenant registration
+    company_name: str
+    document: str
+    document_type: str = "PJ" # "PF" or "PJ"
+    phone: str
 
 class UserLogin(BaseModel):
     email: EmailStr

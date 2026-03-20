@@ -6,6 +6,9 @@ from uuid import UUID
 from app.api.deps import SessionDep, CurrentUser
 from app.models.request import Request
 from app.models.user import User
+from app.models.company import Company
+from app.models.role import Role
+from app.api.routes.roles import seed_system_roles
 from app.schemas.request import Request as RequestSchema, RequestCreate
 from app.core import security
 
@@ -124,6 +127,26 @@ def approve_request(
         )
         db.add(new_user)
     
+    # Business Logic for "account_approval"
+    elif db_obj.type == "account_approval":
+        user = db.query(User).filter(User.id == db_obj.requested_by_id).first()
+        company = db.query(Company).filter(Company.id == db_obj.company_id).first()
+        
+        if user:
+            user.is_active = True
+            db.add(user)
+            
+            # Seed roles and assign Administrador
+            seed_system_roles(db)
+            admin_role = db.query(Role).filter(Role.name == "Administrador", Role.is_system == True).first()
+            if admin_role and admin_role not in user.roles:
+                user.roles.append(admin_role)
+                db.add(user)
+                
+        if company:
+            company.is_active = True
+            db.add(company)
+
     db_obj.status = "approved"
     db.add(db_obj)
     db.commit()
@@ -149,6 +172,16 @@ def reject_request(
     
     if db_obj.status != "pending":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Request already processed")
+
+    # If it's an account approval, cleanup the inactive data so they can try again
+    if db_obj.type == "account_approval":
+        user = db.query(User).filter(User.id == db_obj.requested_by_id).first()
+        company = db.query(Company).filter(Company.id == db_obj.company_id).first()
+        
+        if user:
+            db.delete(user)
+        if company:
+            db.delete(company)
 
     db_obj.status = "rejected"
     db.add(db_obj)

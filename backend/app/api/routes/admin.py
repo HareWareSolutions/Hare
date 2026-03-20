@@ -71,7 +71,41 @@ def delete_company(
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    # Manually delete related records first due to lack of cascade in models
+    # Manually delete related records in order to avoid foreign key constraints
+    from app.models.request import Request
+    from app.models.role import Role
+    from app.models.support import SupportRequest
+    from app.models.sales import Sale, SalesGoal, SalesFunnelStage
+    from app.models.assignment import Sector, Ticket, Task
+    from app.models.transaction import Transaction
+    from app.models.lead import Lead
+    from app.models.supplier import Supplier
+    from app.models.document import Document
+
+    # 1. Requests and Support
+    db.query(Request).filter(Request.company_id == company_id).delete()
+    db.query(SupportRequest).filter(SupportRequest.company_id == company_id).delete()
+    
+    # 2. Sales and Finance
+    db.query(Sale).filter(Sale.company_id == company_id).delete()
+    db.query(SalesGoal).filter(SalesGoal.company_id == company_id).delete()
+    db.query(SalesFunnelStage).filter(SalesFunnelStage.company_id == company_id).delete()
+    db.query(Transaction).filter(Transaction.company_id == company_id).delete()
+    
+    # 3. Assignments (Tasks -> Tickets -> Sectors)
+    ticket_ids = [t.id for t in db.query(Ticket).filter(Ticket.company_id == company_id).all()]
+    if ticket_ids:
+        db.query(Task).filter(Task.ticket_id.in_(ticket_ids)).delete(synchronize_session=False)
+    db.query(Ticket).filter(Ticket.company_id == company_id).delete()
+    db.query(Sector).filter(Sector.company_id == company_id).delete()
+    
+    # 4. CRM and Ops
+    db.query(Lead).filter(Lead.company_id == company_id).delete()
+    db.query(Supplier).filter(Supplier.company_id == company_id).delete()
+    db.query(Document).filter(Document.company_id == company_id).delete()
+    
+    # 5. Core
+    db.query(Role).filter(Role.company_id == company_id).delete()
     db.query(User).filter(User.company_id == company_id).delete()
     db.query(Client).filter(Client.company_id == company_id).delete()
     db.query(Service).filter(Service.company_id == company_id).delete()

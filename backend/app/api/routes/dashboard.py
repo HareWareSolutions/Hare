@@ -38,7 +38,7 @@ def get_dashboard_stats(
     # 3. Support
     open_supports = db.query(SupportRequest).filter(
         SupportRequest.company_id == company.id,
-        SupportRequest.converted_to_ticket_id == None
+        SupportRequest.ticket_id == None
     ).count()
     
     # 4. Assignments (Tickets/Tasks)
@@ -48,7 +48,7 @@ def get_dashboard_stats(
     ).count()
     
     user_tasks = db.query(Task).filter(
-        Task.assigned_to_id == current_user.id,
+        Task.assigned_to == current_user.id,
         Task.status != "Finalizada"
     ).count()
 

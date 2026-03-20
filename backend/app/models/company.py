@@ -10,6 +10,9 @@ class Company(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String, index=True, nullable=False)
+    document = Column(String, index=True, nullable=True) # CPF or CNPJ
+    document_type = Column(String, default="PJ") # PF or PJ
+    phone = Column(String, nullable=True)
     
     stripe_customer_id = Column(String, nullable=True)
     stripe_subscription_id = Column(String, nullable=True)
