@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from app.schemas.role import Role
+from app.schemas.company import Company as CompanySchema
 from uuid import UUID
 from datetime import datetime
 
@@ -38,6 +39,7 @@ class UserInDBBase(UserBase):
 
 class User(UserInDBBase):
     roles: List[Role] = []
+    company: Optional[CompanySchema] = None
 
 class Token(BaseModel):
     access_token: str

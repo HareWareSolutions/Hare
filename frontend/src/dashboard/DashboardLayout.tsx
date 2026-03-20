@@ -17,19 +17,33 @@ export function DashboardLayout() {
 
   const allNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, permission: 'dashboard.view' },
-    { name: 'Vendas', path: '/dashboard/sales', icon: TrendingUp, permission: 'sales.read' },
-    { name: 'Clientes', path: '/dashboard/clients', icon: Users, permission: 'clients.read' },
-    { name: 'Serviços', path: '/dashboard/services', icon: Briefcase, permission: 'services.read' },
+    { name: 'Vendas', path: '/dashboard/sales', icon: TrendingUp, permission: 'sales.read', module: 'sales' },
+    { name: 'Clientes', path: '/dashboard/clients', icon: Users, permission: 'clients.read', module: 'crm' },
+    { name: 'Serviços', path: '/dashboard/services', icon: Briefcase, permission: 'services.read', module: 'crm' },
     { name: 'Usuários', path: '/dashboard/users', icon: UserPlus, permission: 'users.read' },
-    { name: 'Financeiro', path: '/dashboard/finance', icon: DollarSign, permission: 'finance.read' },
-    { name: 'Documentos', path: '/dashboard/documents', icon: FileText, permission: 'documents.read' },
-    { name: 'Atribuições', path: '/dashboard/assignments', icon: CheckSquare, permission: 'assignments.read' },
+    { name: 'Financeiro', path: '/dashboard/finance', icon: DollarSign, permission: 'finance.read', module: 'finance' },
+    { name: 'Documentos', path: '/dashboard/documents', icon: FileText, permission: 'documents.read', module: 'documents' },
+    { name: 'Atribuições', path: '/dashboard/assignments', icon: CheckSquare, permission: 'assignments.read', module: 'assignments' },
     { name: 'Cargos', path: '/dashboard/roles', icon: ShieldCheck, permission: 'roles.manage' },
   ];
 
   const { hasPermission } = useHasPermission();
   
-  const navItems = allNavItems.filter(item => hasPermission(item.permission));
+  const navItems = allNavItems.filter(item => {
+    // Check permission first
+    if (!hasPermission(item.permission)) return false;
+    
+    // If it's a superuser, they see everything they have permission for
+    if (user?.is_superuser) return true;
+    
+    // If item is linked to a module, check if company has it
+    if (item.module) {
+      if (!user?.company?.modules || user.company.modules.length === 0) return true;
+      return user.company.modules.includes(item.module);
+    }
+    
+    return true;
+  });
 
   if (user?.is_superuser) {
     navItems.push({ name: 'Admin', path: '/admin', icon: Shield, permission: 'admin.access' });

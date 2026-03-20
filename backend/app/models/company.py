@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy import Column, String, Boolean, DateTime, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -13,6 +13,7 @@ class Company(Base):
     document = Column(String, index=True, nullable=True) # CPF or CNPJ
     document_type = Column(String, default="PJ") # PF or PJ
     phone = Column(String, nullable=True)
+    modules = Column(JSON, default=["crm", "finance", "support", "sales", "documents", "assignments"])
     
     stripe_customer_id = Column(String, nullable=True)
     stripe_subscription_id = Column(String, nullable=True)

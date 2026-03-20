@@ -3,8 +3,8 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Shield, Lock, Unlock, Building2, Package, Users, Trash2, CheckCircle, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Shield, Lock, Unlock, Building2, Package, Users, Trash2, CheckCircle, Eye, Settings, TrendingUp, DollarSign, Briefcase, FileText, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlansManager } from './PlansManager';
 import { DiagnosticsList } from './DiagnosticsList';
@@ -18,6 +18,7 @@ interface Company {
   is_active: boolean;
   users_count?: number;
   created_at: string;
+  modules: string[];
 }
 
 export function AdminPanel() {
@@ -25,7 +26,10 @@ export function AdminPanel() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [companyToConfig, setCompanyToConfig] = useState<Company | null>(null);
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
 
   useEffect(() => {
     if (activeTab === 'companies') {
@@ -43,6 +47,32 @@ export function AdminPanel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleConfigModules = (company: Company) => {
+    setCompanyToConfig(company);
+    setSelectedModules(company.modules || []);
+    setIsConfigOpen(true);
+  };
+
+  const saveModules = async () => {
+    if (!companyToConfig) return;
+    try {
+      await api.put(`/admin/companies/${companyToConfig.id}/modules`, {
+        modules: selectedModules
+      });
+      toast.success('Módulos atualizados com sucesso!');
+      fetchCompanies();
+      setIsConfigOpen(false);
+    } catch (err) {
+      toast.error('Erro ao atualizar módulos');
+    }
+  };
+
+  const toggleModule = (modId: string) => {
+    setSelectedModules(prev => 
+      prev.includes(modId) ? prev.filter(id => id !== modId) : [...prev, modId]
+    );
   };
 
   const handleToggleBlock = async (company: Company) => {
@@ -211,6 +241,14 @@ export function AdminPanel() {
                         {company.is_active ? <><Lock className="h-4 w-4 mr-1" /> Bloquear</> : <><Unlock className="h-4 w-4 mr-1" /> Desbloquear</>}
                       </Button>
                       <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-2 border-primary text-primary font-bold uppercase"
+                        onClick={() => handleConfigModules(company)}
+                      >
+                        <Settings className="h-4 w-4 mr-1" /> Configurar
+                      </Button>
+                      <Button 
                         variant="destructive" 
                         size="sm"
                         className="bg-red-600 hover:bg-red-700 font-bold uppercase"
@@ -248,6 +286,47 @@ export function AdminPanel() {
         confirmText="Excluir Agora"
         cancelText="Manter Empresa"
       />
+
+      <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
+        <DialogContent className="sm:max-w-[500px] border-2 border-primary">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Configurar Módulos: {companyToConfig?.name}</DialogTitle>
+            <DialogDescription className="font-bold uppercase text-[10px] tracking-widest leading-relaxed text-primary/70">
+              Selecione quais recursos estarão disponíveis para esta empresa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 py-6">
+            {[
+              { id: 'crm', name: 'CRM (Clientes/Serviços)', icon: Users },
+              { id: 'sales', name: 'Vendas (Painel/Metas)', icon: TrendingUp },
+              { id: 'finance', name: 'Financeiro (Transações)', icon: DollarSign },
+              { id: 'support', name: 'Chamados (Suporte)', icon: Briefcase },
+              { id: 'documents', name: 'Documentos', icon: FileText },
+              { id: 'assignments', name: 'Atribuições (Tarefas)', icon: CheckSquare },
+            ].map((mod) => {
+              const Icon = mod.icon;
+              const isChecked = selectedModules.includes(mod.id);
+              return (
+                <div 
+                  key={mod.id} 
+                  onClick={() => toggleModule(mod.id)}
+                  className={`p-4 border-2 transition-all cursor-pointer flex flex-col items-center gap-2 ${isChecked ? 'border-primary bg-primary/5 shadow-md' : 'border-slate-100 bg-white opacity-60'}`}
+                >
+                  <Icon className={`h-6 w-6 ${isChecked ? 'text-primary' : 'text-slate-400'}`} />
+                  <span className={`text-[9px] font-black uppercase text-center ${isChecked ? 'text-primary' : 'text-slate-400'}`}>{mod.name}</span>
+                  <div className={`mt-1 h-4 w-4 border-2 flex items-center justify-center ${isChecked ? 'border-primary bg-primary' : 'border-slate-200'}`}>
+                    {isChecked && <div className="h-2 w-2 bg-white" />}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfigOpen(false)} className="border-2 border-primary font-bold uppercase text-[10px] tracking-widest">Cancelar</Button>
+            <Button onClick={saveModules} className="bg-primary text-white font-bold uppercase text-[10px] tracking-widest">Salvar Configuração</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

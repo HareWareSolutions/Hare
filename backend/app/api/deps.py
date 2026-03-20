@@ -28,7 +28,7 @@ def get_current_user(db: SessionDep, token: TokenDep) -> User:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = db.query(User).options(joinedload(User.roles)).filter(User.id == token_data.sub).first()
+    user = db.query(User).options(joinedload(User.roles), joinedload(User.company)).filter(User.id == token_data.sub).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:

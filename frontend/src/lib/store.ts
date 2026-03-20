@@ -14,6 +14,11 @@ interface User {
   company_id: string;
   is_superuser: boolean;
   roles: Role[];
+  company?: {
+    id: string;
+    name: string;
+    modules: string[];
+  };
 }
 
 interface AuthState {

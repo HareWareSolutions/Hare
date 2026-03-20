@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 
@@ -12,6 +12,10 @@ class CompanyCreate(CompanyBase):
 class CompanyUpdate(CompanyBase):
     pass
 
+class CompanyModulesUpdate(BaseModel):
+    modules: List[str]
+
+
 class CompanyInDBBase(CompanyBase):
     id: UUID
     subscription_status: str
@@ -19,6 +23,7 @@ class CompanyInDBBase(CompanyBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
     users_count: Optional[int] = None
+    modules: Optional[List[str]] = []
 
     class Config:
         from_attributes = True

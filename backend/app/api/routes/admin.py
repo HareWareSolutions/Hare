@@ -4,12 +4,12 @@ from typing import Any, List, Annotated
 from uuid import UUID
 
 from app.api.deps import SessionDep, CurrentUser
-from app.models.company import Company
+from app.models.company import Company as CompanyModel
 from app.models.user import User
 from app.models.plan import Plan
 from app.models.client import Client
 from app.models.service import Service
-from app.schemas.company import Company as CompanySchema
+from app.schemas.company import Company as CompanySchema, CompanyModulesUpdate
 from app.schemas.plan import Plan as PlanSchema, PlanCreate, PlanUpdate
 
 router = APIRouter()
@@ -28,7 +28,7 @@ def read_all_companies(
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
-    companies = db.query(Company).offset(skip).limit(limit).all()
+    companies = db.query(CompanyModel).offset(skip).limit(limit).all()
     for company in companies:
         company.users_count = db.query(User).filter(User.company_id == company.id).count()
     return companies
@@ -39,7 +39,7 @@ def block_company(
     db: SessionDep,
     _superuser: SuperUserDep,
 ) -> Any:
-    company = db.query(Company).filter(Company.id == company_id).first()
+    company = db.query(CompanyModel).filter(CompanyModel.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     company.is_active = False
@@ -53,7 +53,7 @@ def unblock_company(
     db: SessionDep,
     _superuser: SuperUserDep,
 ) -> Any:
-    company = db.query(Company).filter(Company.id == company_id).first()
+    company = db.query(CompanyModel).filter(CompanyModel.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     company.is_active = True
@@ -67,7 +67,7 @@ def delete_company(
     db: SessionDep,
     _superuser: SuperUserDep,
 ) -> Any:
-    company = db.query(Company).filter(Company.id == company_id).first()
+    company = db.query(CompanyModel).filter(CompanyModel.id == company_id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
@@ -119,6 +119,30 @@ def delete_company(
     db.delete(company)
     db.commit()
     return {"message": "Company and all its data deleted successfully"}
+
+@router.put("/companies/{company_id}/modules", response_model=CompanySchema)
+def update_company_modules(
+    *,
+    db: SessionDep,
+    current_user: CurrentUser,
+    company_id: UUID,
+    modules_in: CompanyModulesUpdate,
+) -> Any:
+    """
+    Update company modules (Superadmin only).
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+        
+    company = db.query(CompanyModel).filter(CompanyModel.id == company_id).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    company.modules = modules_in.modules
+    db.add(company)
+    db.commit()
+    db.refresh(company)
+    return company
 
 @router.get("/plans", response_model=List[PlanSchema])
 def read_all_plans(
