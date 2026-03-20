@@ -1,0 +1,83 @@
+================================================================================
+INSTRUÇÕES DE INSTALAÇÃO - SISTEMA HARE
+================================================================================
+
+Este guia descreve o passo a passo para configurar e rodar o sistema Hare 
+em uma nova máquina (Ambiente de Desenvolvimento).
+
+--------------------------------------------------------------------------------
+1. PRÉ-REQUISITOS
+--------------------------------------------------------------------------------
+Certifique-se de ter instalado:
+- Git
+- Python 3.10 ou superior
+- Node.js 18 ou superior (com npm)
+- Docker & Docker Compose (Recomendado para o Banco de Dados)
+- PostgreSQL (Caso não utilize Docker)
+
+--------------------------------------------------------------------------------
+2. CLONANDO O REPOSITÓRIO
+--------------------------------------------------------------------------------
+Abra o terminal e execute:
+git clone https://github.com/giordanoEnzo/Hare.git
+cd Hare
+
+--------------------------------------------------------------------------------
+3. CONFIGURAÇÃO DO BACKEND (FastAPI + SQLAlchemy)
+--------------------------------------------------------------------------------
+Acesse a pasta do backend:
+cd backend
+
+Crie e ative um ambiente virtual:
+python -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+
+Instale as dependências:
+pip install -r requirements.txt
+
+Configure as variáveis de ambiente:
+cp .env.example .env (ou use o arquivo da raiz se preferir)
+# Edite o arquivo .env com as credenciais do seu banco de dados local.
+
+Execute as migrações do banco de dados (Alembic):
+alembic upgrade head
+
+Inicie o servidor backend:
+uvicorn app.main:app --reload
+# O backend estará rodando em http://localhost:8000 (API v1)
+
+--------------------------------------------------------------------------------
+4. CONFIGURAÇÃO DO FRONTEND (React + Vite + Tailwind)
+--------------------------------------------------------------------------------
+Abra um novo terminal na raiz do projeto e acesse a pasta do frontend:
+cd frontend
+
+Instale as dependências:
+npm install
+
+Configure as variáveis de ambiente:
+# Crie o arquivo .env se não existir:
+echo "VITE_API_URL=http://localhost:8000/api/v1" > .env
+
+Inicie o servidor de desenvolvimento:
+npm run dev
+# O frontend estará acessível em http://localhost:5173
+
+--------------------------------------------------------------------------------
+5. PRIMEIRA UTILIZAÇÃO (Criação de Superuser)
+--------------------------------------------------------------------------------
+Para acessar as áreas administrativas, você precisa de um usuário com 
+permissões de Superuser.
+
+1. Registre-se pela interface do sistema (/register).
+2. No terminal do backend (com venv ativo), execute:
+   python create_superuser.py [SEU_EMAIL_DE_REGISTRO]
+
+--------------------------------------------------------------------------------
+6. MÉTODO RÁPIDO COM DOCKER (Alternativo)
+--------------------------------------------------------------------------------
+Se preferir rodar tudo via Docker:
+docker-compose up --build
+
+Isso subirá o Banco de Dados, o Backend e o Frontend automaticamente.
+================================================================================

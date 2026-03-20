@@ -1,0 +1,30 @@
+# Python
+backend/venv/
+backend/.venv/
+.venv/
+backend/__pycache__/
+__pycache__/
+backend/*.pyc
+.pytest_cache/
+backend/uploads/
+backend/app/static/
+
+# Node
+frontend/node_modules/
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Environment
+.env
+backend/.env
+frontend/.env
+.env.local
+.env.*.local
+
+# Docker
+docker/data/
+
+# OS
+.DS_Store
+Thumbs.db

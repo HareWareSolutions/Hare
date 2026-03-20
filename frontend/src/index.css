@@ -1,0 +1,51 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  :root, .dark, .light {
+    /* HareWare Global Palette (Landing Page Match) */
+    --background: 0 0% 100%;
+    --foreground: 221 89% 21%; /* #062464 */
+    
+    --card: 0 0% 100%;
+    --card-foreground: 221 89% 21%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 89% 21%;
+    
+    /* Primary: #062464 */
+    --primary: 221 89% 21%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 210 40% 96.1%; /* slate-50/100ish */
+    --secondary-foreground: 221 89% 21%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 221 89% 40%; /* Lighter blue for muted */
+    
+    /* Accent: #00c853 */
+    --accent: 145 100% 39%;
+    --accent-foreground: 0 0% 100%; /* Or dark blue depending on contrast, white works */
+    
+    /* Destructive: #EF4444 */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Border/Input: #b3b2b2 */
+    --border: 0 1% 70%;
+    --input: 0 1% 70%;
+    --ring: 145 100% 39%; /* Accent ring */
+    
+    /* Square Edges */
+    --radius: 0rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
