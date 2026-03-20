@@ -40,7 +40,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api/v1}
     # Wait for backend to avoid immediate connection race conditions initially (optional but good practice)
     depends_on:
       - backend
