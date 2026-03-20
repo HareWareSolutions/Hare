@@ -105,6 +105,12 @@ def delete_company(
     db.query(Document).filter(Document.company_id == company_id).delete()
     
     # 5. Core
+    # First, handle the many-to-many relationship in user_roles
+    from app.models.user_role import user_roles
+    user_ids = [u.id for u in db.query(User).filter(User.company_id == company_id).all()]
+    if user_ids:
+        db.execute(user_roles.delete().where(user_roles.c.user_id.in_(user_ids)))
+    
     db.query(Role).filter(Role.company_id == company_id).delete()
     db.query(User).filter(User.company_id == company_id).delete()
     db.query(Client).filter(Client.company_id == company_id).delete()
