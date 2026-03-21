@@ -33,14 +33,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api/v1}
     container_name: hareware_frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - "5173:5173"
+      - "80:80"
     environment:
       - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api/v1}
+
     # Wait for backend to avoid immediate connection race conditions initially (optional but good practice)
     depends_on:
       - backend
