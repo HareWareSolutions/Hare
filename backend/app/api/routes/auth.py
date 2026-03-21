@@ -75,26 +75,26 @@ def register(user_in: UserCreate, db: SessionDep) -> Any:
 
 @router.post("/login", response_model=Token)
 def login(db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
-    # Diagnostic logging
+    # Diagnostic logging with print for visibility in production
     from app.models.user import User
     total_users = db.query(User).count()
-    logger.info(f"Conectado ao DB. Total de usuários na tabela: {total_users}")
-    logger.info(f"Tentativa de login para usuário: '{form_data.username}'")
+    print(f"--- DEBUG: Conectado ao DB. Total de usuários: {total_users}")
+    print(f"--- DEBUG: Tentativa de login para: '{form_data.username}'")
     
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user:
-        logger.warning(f"Usuário não encontrado: {form_data.username}")
+        print(f"--- DEBUG: Usuário '{form_data.username}' NÃO encontrado no banco.")
         raise HTTPException(status_code=400, detail="Incorrect email or password")
         
     if not security.verify_password(form_data.password, user.hashed_password):
-        logger.warning(f"Senha incorreta para usuário: {form_data.username}")
+        print(f"--- DEBUG: Senha INCORRETA para: '{form_data.username}'")
         raise HTTPException(status_code=400, detail="Incorrect email or password")
         
     if not user.is_active:
-        logger.warning(f"Usuário inativo: {form_data.username}")
+        print(f"--- DEBUG: Usuário '{form_data.username}' está INATIVO.")
         raise HTTPException(status_code=400, detail="Inactive user")
         
-    logger.info(f"Login bem-sucedido: {form_data.username}")
+    print(f"--- DEBUG: Login SUCESSO para: '{form_data.username}'")
         
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {

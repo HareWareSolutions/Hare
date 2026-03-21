@@ -14,24 +14,20 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Simplified CORS to allow all origins, methods, and headers for maximum flexibility
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*", 
-        "http://localhost:5173",
-        "https://service-system.hareware.com.br",
-        "https://hareware.com.br",
-    ] if not settings.JWT_SECRET else ["*"], # Temporary broad allow
-    allow_origin_regex=".*",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=True, # Keep if cookies/auth headers are used
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logger.info(f"Incoming request: {request.method} {request.url}")
-    logger.info(f"Origin header: {request.headers.get('origin')}")
+    # Using print for guaranteed visibility in production logs
+    print(f"--- DEBUG REQUEST: {request.method} {request.url}")
+    print(f"--- DEBUG ORIGIN: {request.headers.get('origin')}")
     response = await call_next(request)
     return response
 
