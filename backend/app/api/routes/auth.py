@@ -75,7 +75,12 @@ def register(user_in: UserCreate, db: SessionDep) -> Any:
 
 @router.post("/login", response_model=Token)
 def login(db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
-    logger.info(f"Tentativa de login para usuário: {form_data.username}")
+    # Diagnostic logging
+    from app.models.user import User
+    total_users = db.query(User).count()
+    logger.info(f"Conectado ao DB. Total de usuários na tabela: {total_users}")
+    logger.info(f"Tentativa de login para usuário: '{form_data.username}'")
+    
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user:
         logger.warning(f"Usuário não encontrado: {form_data.username}")
