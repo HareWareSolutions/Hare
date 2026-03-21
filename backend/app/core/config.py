@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     
     STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
     STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
-    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
-    DOMAIN: str = os.getenv("DOMAIN", "hare.hareware.com.br")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "https://hareware.com.br")
+    DOMAIN: str = os.getenv("DOMAIN", "hareware.com.br")
     SUPERADMIN_EMAIL: str = "giordano@hareware.com.br"
 
     class Config:
