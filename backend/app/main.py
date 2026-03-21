@@ -17,8 +17,12 @@ app = FastAPI(
 # Simplified CORS to allow all origins, methods, and headers for maximum flexibility
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True, # Keep if cookies/auth headers are used
+    allow_origins=[
+        "https://hareware.com.br",
+        "https://service-system.hareware.com.br",
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

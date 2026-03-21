@@ -42,8 +42,9 @@ export function Register() {
       
       toast.success('Cadastro realizado com sucesso! Sua conta está pendente de aprovação pelo administrador.');
       navigate('/login');
-    } catch (error) {
-      toast.error('Erro ao cadastrar. O email já pode estar em uso.');
+    } catch (error: any) {
+      const detail = error.response?.data?.detail || 'Erro ao cadastrar. Verifique sua conexão ou tente outro e-mail.';
+      toast.error(detail);
     } finally {
       setIsLoading(false);
     }
