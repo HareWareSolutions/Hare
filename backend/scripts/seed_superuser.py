@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Adiciona o diretório atual ao PYTHONPATH para que o módulo 'app' possa ser encontrado
+sys.path.append(os.getcwd())
+
 from app.db.database import SessionLocal
 from app.models.user import User
 from app.models.company import Company
