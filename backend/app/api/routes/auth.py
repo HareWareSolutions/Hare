@@ -1,4 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from typing import Any
@@ -72,11 +75,21 @@ def register(user_in: UserCreate, db: SessionDep) -> Any:
 
 @router.post("/login", response_model=Token)
 def login(db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
+    logger.info(f"Tentativa de login para usuário: {form_data.username}")
     user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
+    if not user:
+        logger.warning(f"Usuário não encontrado: {form_data.username}")
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not user.is_active:
+        
+    if not security.verify_password(form_data.password, user.hashed_password):
+        logger.warning(f"Senha incorreta para usuário: {form_data.username}")
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        
+    if not user.is_active:
+        logger.warning(f"Usuário inativo: {form_data.username}")
         raise HTTPException(status_code=400, detail="Inactive user")
+        
+    logger.info(f"Login bem-sucedido: {form_data.username}")
         
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {

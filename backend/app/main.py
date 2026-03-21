@@ -16,6 +16,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://0.0.0.0:5173",
+        "https://service-system.hareware.com.br",
+        "https://hareware.com.br",
     ],
     allow_origin_regex="http://.*:5173",
     allow_credentials=True,
