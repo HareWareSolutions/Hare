@@ -38,7 +38,7 @@ services:
         - VITE_API_URL=${VITE_API_URL:-https://service-system.hareware.com.br/api/v1}
     container_name: hareware_frontend
     ports:
-      - "80:80"
+      - "3004:80"
     environment:
       - VITE_API_URL=${VITE_API_URL:-https://service-system.hareware.com.br/api/v1}
 
