@@ -5,8 +5,7 @@ import sys
 sys.path.append(os.getcwd())
 
 from app.db.database import SessionLocal
-from app.models.user import User
-from app.models.company import Company
+from app.db.base import User, Company
 from app.core import security
 from app.core.config import settings
 import uuid
