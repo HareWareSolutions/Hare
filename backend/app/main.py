@@ -24,14 +24,8 @@ async def log_requests(request: Request, call_next):
 # Configure CORS as the outermost middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://hareware.com.br",
-        "https://www.hareware.com.br",
-        "https://service-system.hareware.com.br",
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
